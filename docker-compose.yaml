@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  backend:
+    build: ./backendleadgen
+    container_name: backend
+    restart: always
+    env_file:
+      - ./backendleadgen/.env
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    networks:
+      - their-network
+
+  frontend:
+    build: ./frontendleadgen
+    container_name: frontend
+    restart: always
+    env_file:
+      - ./frontendleadgen/.env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+    networks:
+      - their-network
+
+volumes:
+  mongo-data:
+
+networks:
+  their-network:
+    driver: bridge
